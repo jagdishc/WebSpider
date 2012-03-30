@@ -16,7 +16,7 @@ public class WebSpiderApp extends SingleFrameApplication {
         return Application.getInstance(WebSpiderApp.class);
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) {        
         launch(WebSpiderApp.class, args);
     }
 }

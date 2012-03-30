@@ -4,22 +4,33 @@ import org.jdesktop.application.Action;
 import org.jdesktop.application.ResourceMap;
 import org.jdesktop.application.SingleFrameApplication;
 import org.jdesktop.application.FrameView;
-import org.jdesktop.application.Task;
 import org.jdesktop.application.TaskMonitor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
 import javax.swing.Timer;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JRootPane;
+import javax.swing.UIManager;
 
+import mobilecrawler.MobileAgentMasterView;
 
 public class WebSpiderView extends FrameView {
 
     public WebSpiderView(SingleFrameApplication app) {
         super(app);
-        initComponents();   
+        initComponents();
+        searchLimit.setText("30");
+        try
+        {
+            UIManager.setLookAndFeel("com.sun.java.swing.plaf.nimbus.NimbusLookAndFeel");
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
         getRootPane().setWindowDecorationStyle(JRootPane.NONE);        
         ResourceMap resourceMap = getResourceMap();
         int messageTimeout = resourceMap.getInteger("StatusBar.messageTimeout");
@@ -73,16 +84,18 @@ public class WebSpiderView extends FrameView {
     private void initComponents() {
 
         mainPanel = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        titleImage = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jButton1 = new javax.swing.JButton();
+        searchLimit = new javax.swing.JTextField();
+        exit = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
         seedURL = new javax.swing.JTextField();
-        jLabel4 = new javax.swing.JLabel();
-        searchLimit = new javax.swing.JTextField();
-        jButton1 = new javax.swing.JButton();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        exit = new javax.swing.JButton();
+        statusLabel = new javax.swing.JLabel();
         menuBar = new javax.swing.JMenuBar();
         javax.swing.JMenu fileMenu = new javax.swing.JMenu();
+        magent = new javax.swing.JMenuItem();
         javax.swing.JMenuItem exitMenuItem = new javax.swing.JMenuItem();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -94,22 +107,24 @@ public class WebSpiderView extends FrameView {
 
         mainPanel.setAutoscrolls(true);
         mainPanel.setFocusTraversalPolicyProvider(true);
+        mainPanel.setMaximumSize(new java.awt.Dimension(750, 450));
         mainPanel.setName("mainPanel"); // NOI18N
+        mainPanel.setPreferredSize(new java.awt.Dimension(750, 450));
 
+        jPanel1.setMaximumSize(new java.awt.Dimension(750, 450));
+        jPanel1.setName("jPanel1"); // NOI18N
+        jPanel1.setPreferredSize(new java.awt.Dimension(750, 450));
+
+        titleImage.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         org.jdesktop.application.ResourceMap resourceMap = org.jdesktop.application.Application.getInstance(webspider.WebSpiderApp.class).getContext().getResourceMap(WebSpiderView.class);
-        jLabel2.setFont(resourceMap.getFont("seedUrl_label.font")); // NOI18N
-        jLabel2.setLabelFor(seedURL);
-        jLabel2.setText(resourceMap.getString("seedUrl_label.text")); // NOI18N
-        jLabel2.setName("seedUrl_label"); // NOI18N
-
-        seedURL.setText(resourceMap.getString("seedUrl_text.text")); // NOI18N
-        seedURL.setName("seedUrl_text"); // NOI18N
+        titleImage.setIcon(resourceMap.getIcon("imgLabel.icon")); // NOI18N
+        titleImage.setIconTextGap(0);
+        titleImage.setName("imgLabel"); // NOI18N
+        titleImage.setPreferredSize(new java.awt.Dimension(750, 450));
 
         jLabel4.setFont(resourceMap.getFont("searchLimit_label.font")); // NOI18N
         jLabel4.setText(resourceMap.getString("searchLimit_label.text")); // NOI18N
         jLabel4.setName("searchLimit_label"); // NOI18N
-
-        searchLimit.setName("searchLimit_text"); // NOI18N
 
         javax.swing.ActionMap actionMap = org.jdesktop.application.Application.getInstance(webspider.WebSpiderApp.class).getContext().getActionMap(WebSpiderView.class, this);
         jButton1.setAction(actionMap.get("startCrawling")); // NOI18N
@@ -122,81 +137,96 @@ public class WebSpiderView extends FrameView {
             }
         });
 
-        jPanel1.setName("jPanel1"); // NOI18N
-
-        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jLabel1.setIcon(resourceMap.getIcon("imgLabel.icon")); // NOI18N
-        jLabel1.setIconTextGap(0);
-        jLabel1.setName("imgLabel"); // NOI18N
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jLabel1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap())
-        );
+        searchLimit.setName("searchLimit_text"); // NOI18N
 
         exit.setAction(actionMap.get("quit")); // NOI18N
         exit.setFont(resourceMap.getFont("exit.font")); // NOI18N
         exit.setText(resourceMap.getString("exit.text")); // NOI18N
         exit.setName("exit"); // NOI18N
 
+        jLabel2.setFont(resourceMap.getFont("seedUrl_label.font")); // NOI18N
+        jLabel2.setLabelFor(seedURL);
+        jLabel2.setText(resourceMap.getString("seedUrl_label.text")); // NOI18N
+        jLabel2.setName("seedUrl_label"); // NOI18N
+
+        seedURL.setText(resourceMap.getString("seedUrl_text.text")); // NOI18N
+        seedURL.setName("seedUrl_text"); // NOI18N
+
+        statusLabel.setText(resourceMap.getString("statusLabel.text")); // NOI18N
+        statusLabel.setName("statusLabel"); // NOI18N
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(titleImage, javax.swing.GroupLayout.PREFERRED_SIZE, 676, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(43, 43, 43)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(70, 70, 70)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(seedURL, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(searchLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGap(169, 169, 169)
+                        .addComponent(jButton1)
+                        .addGap(186, 186, 186)
+                        .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(32, Short.MAX_VALUE))
+            .addComponent(statusLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 696, Short.MAX_VALUE)
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(titleImage, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(seedURL, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(searchLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(29, 29, 29)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(exit, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE))
+                .addGap(20, 20, 20)
+                .addComponent(statusLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
+        );
+
         javax.swing.GroupLayout mainPanelLayout = new javax.swing.GroupLayout(mainPanel);
         mainPanel.setLayout(mainPanelLayout);
         mainPanelLayout.setHorizontalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(mainPanelLayout.createSequentialGroup()
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addGap(336, 336, 336)
-                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(70, 70, 70)
-                        .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(searchLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 53, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(seedURL, javax.swing.GroupLayout.PREFERRED_SIZE, 318, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(279, 279, 279))
-                    .addGroup(mainPanelLayout.createSequentialGroup()
-                        .addGap(464, 464, 464)
-                        .addComponent(jButton1)
-                        .addGap(185, 185, 185)
-                        .addComponent(exit, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addContainerGap())
+                .addContainerGap()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 694, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(26, Short.MAX_VALUE))
         );
         mainPanelLayout.setVerticalGroup(
             mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(mainPanelLayout.createSequentialGroup()
-                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(37, 37, 37)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 51, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(seedURL, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 43, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(searchLimit, javax.swing.GroupLayout.PREFERRED_SIZE, 33, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(43, 43, 43)
-                .addGroup(mainPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(exit, javax.swing.GroupLayout.DEFAULT_SIZE, 46, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 46, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(86, 86, 86))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 436, Short.MAX_VALUE)
         );
 
         menuBar.setName("menuBar"); // NOI18N
 
         fileMenu.setText(resourceMap.getString("fileMenu.text")); // NOI18N
         fileMenu.setName("fileMenu"); // NOI18N
+
+        magent.setAction(actionMap.get("startMobileAgent")); // NOI18N
+        magent.setText(resourceMap.getString("magent.text")); // NOI18N
+        magent.setName("magent"); // NOI18N
+        fileMenu.add(magent);
 
         exitMenuItem.setAction(actionMap.get("quit")); // NOI18N
         exitMenuItem.setName("exitMenuItem"); // NOI18N
@@ -244,10 +274,8 @@ public class WebSpiderView extends FrameView {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jButton1MouseClicked
-        String seed = seedURL.getText();
-        int search = Integer.parseInt(searchLimit.getText());
-        WebSpider ws = new WebSpider(seed,search);
-        ws.start();       
+                
+
     }//GEN-LAST:event_jButton1MouseClicked
 
     private void jMenuItem1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenuItem1MouseClicked
@@ -258,31 +286,69 @@ public class WebSpiderView extends FrameView {
     public void callfunc() {
         try
         {
-            CrawlHistory cHistory = new CrawlHistory(WebSpider.vectorSearched);
-            cHistory.setVisible(true);            
-            WebSpiderApp.getApplication().show(cHistory);
+            
         }
         catch(Exception ex)
         {
             ex.printStackTrace();
         }  
     }
+
+    @Action
+    public void startCrawling() 
+    {
+        String seed = seedURL.getText();
+        int search = Integer.parseInt(searchLimit.getText());
+        
+        WebSpider ws = new WebSpider(seed,search,this);
+        ws.start();
+    }
+
+    @Action
+    public void startMobileAgent() 
+    {        
+        try
+        {           
+            File dir = new File("G:\\aglets\\bin");
+            if(port_number == 0)
+            {
+                Process process = Runtime.getRuntime().exec("cmd /c start G:\\aglets\\bin\\agletsd.bat");
+                port_number += 1;
+            }
+            else if(port_number == 1)
+            {
+                Process process = Runtime.getRuntime().exec("cmd /c start G:\\aglets\\bin\\agletsd.bat -port 9000");
+                port_number += 1;
+            }
+            else
+            {
+                Process process = Runtime.getRuntime().exec("cmd /c start G:\\aglets\\bin\\agletsd.bat -port 5000");
+                port_number += 1;
+            }
+        }
+        catch(Exception e)
+        {
+            e.printStackTrace();
+        }
+    }
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenuItem CrawlHistory;
     private javax.swing.JMenu View;
     private javax.swing.JButton exit;
     private javax.swing.JButton jButton1;
-    private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JMenuItem magent;
     private javax.swing.JPanel mainPanel;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTextField searchLimit;
     private javax.swing.JTextField seedURL;
+    public javax.swing.JLabel statusLabel;
+    private javax.swing.JLabel titleImage;
     // End of variables declaration//GEN-END:variables
 
     private final Timer messageTimer;
@@ -290,6 +356,6 @@ public class WebSpiderView extends FrameView {
     private final Icon[] busyIcons = new Icon[15];
     private int busyIconIndex = 0;
     private JDialog aboutBox;
-    
+    public int port_number = 0;
 
 }

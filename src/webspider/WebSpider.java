@@ -14,16 +14,20 @@ class WebSpider extends Thread
     Vector vectorToSearch;  //List of url's to be crawled.
     static Vector vectorSearched;  //List of url's that have been crawled.
     String seedURL;         //Starting url given by the user.
-    public static final String DISALLOW = "Disallow:";  
-    int searchLimit = 20, numberOfSearches = 0;//searchLimit: Defines the total number of page to be crawled.   
+    public static final String DISALLOW = "Disallow:"; 
+    public static int totalBytes = 0;
+    int searchLimit = 30, numberOfSearches = 0;//searchLimit: Defines the total number of page to be crawled.   
     CrawlHistory cHistory;
+    HashMap<String, Long> odbfm;
+    //WebSpiderView wsv;
 
-    WebSpider(String seed,int search)
+    WebSpider(String seed,int search, WebSpiderView wsv)
     {
         seedURL = seed;
         searchLimit = search;
         cHistory = new CrawlHistory();
-        
+        odbfm = new HashMap<>();
+        //this.wsv = wsv;
     }
     public void run()
     {
@@ -34,15 +38,16 @@ class WebSpider extends Thread
         vectorToSearch = new Vector();
         vectorSearched = new Vector();               
         vectorToSearch.addElement(seedURL);
+        cHistory.setTitle("Crawl history for: " + seedURL);
         cHistory.crawlHistory.setText("Starting the process...\n");
         cHistory.progressStatus.setMaximum(searchLimit);
         cHistory.setVisible(true);
-        cHistory.crawlHistory.setEditable(false);
+        cHistory.crawlHistory.setEditable(false);        
         pageReader();               
     }
     public void pageReader()    //Connects to the specified url and reads the html content.
     {
-        while(vectorToSearch.size()>0 && numberOfSearches<searchLimit)
+        while(vectorToSearch.size() > 0 && numberOfSearches < searchLimit)
         {
             try
             {
@@ -52,13 +57,15 @@ class WebSpider extends Thread
                 if(startURL.getProtocol().compareTo("http") != 0 && robotSafe(startURL))
                 {                    
                     //Skips to next iteration when the protocol is not http or when the url is not safe to crawl given by the robots.txt of the website.
-                    System.out.println("OMITTED - " + startURL.toString());                                                           
+                    System.out.println("OMITTED - " + startURL.toString()); 
+                    cHistory.crawlHistory.append("OMITTED: " + url_string + "\n");
                     continue;
                 }
                 numberOfSearches += 1; 
                 cHistory.crawlHistory.append("Crawled: " + url_string + "\n");
                 vectorSearched.addElement(url_string);
                 cHistory.progressStatus.setValue(vectorSearched.size());
+                //wsv.statusLabel.setText("Processing: " + cHistory.progressStatus.getPercentComplete()*100 + "% completed");
                 cHistory.progress.setText("Completed " + cHistory.progressStatus.getPercentComplete()*100 + "%");
                 System.out.println("Crawled: " + startURL.toString());                               
                 startURL.openConnection();
@@ -89,27 +96,67 @@ class WebSpider extends Thread
                 BufferedWriter writer = new BufferedWriter(new FileWriter(path));
                 String line, fullHtml = "";                
                 while ((line = reader.readLine()) != null) 
-                {                    
+                {
+                    totalBytes += line.length();
                     writer.write(line);
                     writer.newLine();
                     fullHtml += line;
                 }               
                 reader.close();
-                writer.close();                
+                writer.close();           
+                File file = new File(path);
+                long value = file.lastModified();
+                if(!odbfm.containsKey(file.toString()))
+                {
+                    odbfm.put(file.toString(), value);
+                }
                 //Reads the page and stores it in appropriate location in the local harddisk.
                 htmlParser(fullHtml);
             }
-                catch(MalformedURLException e)                
-                {}
-                catch(Exception ex)
-                {}           
+            catch(MalformedURLException e)                
+            {
+                e.printStackTrace();
+            }
+            catch(Exception ex)
+            {
+                ex.printStackTrace();
+            }           
         }
-        if(vectorToSearch.size() <= 0 || numberOfSearches>=searchLimit)
+        if(vectorToSearch.size() <= 0 || numberOfSearches >= searchLimit)
         {
-            System.out.println("Finished the crawling process.");
-            cHistory.crawlHistory.append("Process Completed.");
-            cHistory.progress.setText("Completed.");
-            //System.exit(0);
+            URL temp;
+            try
+            {
+                temp = new URL(seedURL);
+            
+                File odbfm_file = new File("odbfm/url_odbfm.dat");
+                try
+                {
+                    FileWriter file_writer = new FileWriter(odbfm_file, true);
+                    for(Iterator<String> it = odbfm.keySet().iterator();it.hasNext();)
+                    {
+                        String u = it.next();
+                        long l_mod_date = odbfm.get(u);
+                        file_writer.write(u + "^" + l_mod_date);
+                        file_writer.write("\n");
+                    }
+                    file_writer.close();
+                }
+                catch(Exception e)
+                {
+                    e.printStackTrace();
+                }
+                System.out.println("Finished the crawling process.");
+                //wsv.statusLabel.setText("Finished the crawling process for: " + seedURL);
+                cHistory.crawlHistory.append("Process Completed.\n");
+                cHistory.crawlHistory.append("Total number of Kilo bytes downloaded: " + ((float)(totalBytes/1024)));
+                cHistory.progress.setText("Completed.");
+                //System.exit(0);
+            }
+            catch(Exception e)
+            {
+                e.printStackTrace();
+            }
         }
     }
     public boolean robotSafe(URL url)   //Checks whether the page is safe to crawl from the robots.txt
@@ -177,7 +224,8 @@ class WebSpider extends Thread
             }
         }
         catch(Exception e)
-        {            
+        {
+            e.printStackTrace();
         }        
         
     }

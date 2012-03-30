@@ -27,19 +27,17 @@
               <EmptySpace min="-2" pref="56" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
                   <Component id="crawlHistLabel" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Group type="103" alignment="0" groupAlignment="1" max="-2" attributes="0">
-                      <Group type="102" alignment="1" attributes="1">
-                          <Group type="103" groupAlignment="0" attributes="0">
-                              <Component id="progressStatus" min="-2" max="-2" attributes="0"/>
-                              <Component id="progress" min="-2" pref="89" max="-2" attributes="0"/>
-                          </Group>
-                          <EmptySpace pref="335" max="32767" attributes="0"/>
-                          <Component id="exit" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="0" attributes="1">
+                      <Group type="103" groupAlignment="0" max="-2" attributes="0">
+                          <Component id="progress" max="32767" attributes="1"/>
+                          <Component id="progressStatus" alignment="0" max="32767" attributes="1"/>
                       </Group>
-                      <Component id="jScrollPane1" alignment="1" min="-2" pref="532" max="-2" attributes="0"/>
+                      <EmptySpace pref="441" max="32767" attributes="0"/>
+                      <Component id="exit" min="-2" max="-2" attributes="0"/>
                   </Group>
+                  <Component id="jScrollPane1" alignment="1" min="-2" pref="638" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace pref="77" max="32767" attributes="0"/>
+              <EmptySpace pref="94" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
